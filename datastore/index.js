@@ -25,23 +25,35 @@ exports.create = (text, callback) => {
     }
   });
 
-  // console.log('------------------------> ID: ' + id);
-
-
 };
 
 exports.readAll = (callback) => {
+  
   var data = [];
-  _.each(items, (text, id) => {
-    data.push({
-      id,
-      text
-    });
+
+  fs.readdir(exports.dataDir, (err, files) => {
+    if (err) {
+      console.log(err);
+    } else {
+      for (let i = 0; i < files.length; i++) {
+        var id = files[i].split('.')[0];
+        data.push({id: id, text: id});
+      }
+      callback(null, data); 
+    }
   });
-  callback(null, data);
+
 };
 
 exports.readOne = (id, callback) => {
+  // fs.readFile(path.join(exports.dataDir, `${id}.txt`), (err, fileData) => {
+  //   if (err) {
+  //     console.log(err);
+  //   } else {
+  //     callback(null, JSON.parse(fileData));
+  //   }
+  // });
+
   var text = items[id];
   if (!text) {
     callback(new Error(`No item with id: ${id}`));
