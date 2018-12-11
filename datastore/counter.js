@@ -35,7 +35,6 @@ const writeCounter = (count, callback) => {
     }
   });
 };
-
 // Public API - Fix this function //////////////////////////////////////////////
 
 exports.getNextUniqueId = (callback) => {
@@ -53,7 +52,6 @@ exports.getNextUniqueId = (callback) => {
       });
     }
   });
-
 };
 
 

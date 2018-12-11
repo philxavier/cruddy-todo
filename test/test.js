@@ -9,6 +9,8 @@ const initializeTestFiles = () => {
   counter.counterFile = path.join(__dirname, './counterTest.txt');
   todos.dataDir = path.join(__dirname, 'testData');
   todos.initialize();
+
+  // console.log('DIR NAME----------------------> ' + __dirname);
 };
 
 const initializeTestCounter = (id = '') => {
