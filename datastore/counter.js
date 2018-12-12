@@ -28,6 +28,7 @@ const readCounter = (callback) => {
 const writeCounter = (count, callback) => {
   var counterString = zeroPaddedNumber(count);
   fs.writeFile(exports.counterFile, counterString, (err) => {
+    //console.log('EXPORTS.COUNTERFILE ----------->', exports.counterFile);
     if (err) {
       throw ('error writing counter');
     } else {

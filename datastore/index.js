@@ -19,13 +19,14 @@ exports.create = (text, callback) => {
         if (err) {
           throw ('error writing counter');
         } else {
-          callback(null, items);
+          callback(null, items);  
         }
       });
     }
   });
 
 };
+
 
 exports.readAll = (callback) => {
   
@@ -46,32 +47,16 @@ exports.readAll = (callback) => {
 };
 
 exports.readOne = (id, callback) => {
-  // console.log('------------------->PATH ' + path.join(exports.dataDir, `${id}.txt`));
   fs.readFile(path.join(exports.dataDir, `${id}.txt`), (err, fileData) => {
     if (err) {
       console.log(err);
       callback(err, {});
     } else {
-      var todo = {};
-      todo.text = fileData;
-      todo.id = id;
-      // console.log('File data------------------->' + text);
-      // console.log('JSON parsed----------------->' + JSON.parse(fileData));
+      var todo = {id: id, text: fileData.toString()};
       callback(null, todo);
     }
   });
 
-
-
-  // var text = items[id];
-  // if (!text) {
-  //   callback(new Error(`No item with id: ${id}`));
-  // } else {
-  //   callback(null, {
-  //     id,
-  //     text
-  //   });
-  // }
 };
 
 exports.update = (id, text, callback) => {
