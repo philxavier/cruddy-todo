@@ -76,17 +76,17 @@ exports.update = (id, text, callback) => {
 
 };
 
-// x
 
 exports.delete = (id, callback) => {
-  var item = items[id];
-  delete items[id];
-  if (!item) {
-    // report an error if item not found
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback();
-  }
+
+  fs.unlink(path.join(exports.dataDir, `${id}.txt`), (err) => {
+    if (err) {
+      callback(err);
+    } else {
+      //console.log(`${id}.txt was deleted`);
+      callback(null);
+    }
+  });
 };
 
 // "Complete deleting a todo"
