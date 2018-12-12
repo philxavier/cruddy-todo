@@ -60,17 +60,23 @@ exports.readOne = (id, callback) => {
 };
 
 exports.update = (id, text, callback) => {
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, {
-      id,
-      text
+  
+  if (fs.existsSync(path.join(exports.dataDir, `${id}.txt`))) {
+    fs.writeFile(path.join(exports.dataDir, `${id}.txt`), text, (err) => {
+      if (err) {
+        console.log(err);
+        callback(err, {});
+      } else {
+        callback(null, {id: id, text: text});  
+      }
     });
-  }
+  } else {
+    callback('dog', {});
+  }  
+
 };
+
+// x
 
 exports.delete = (id, callback) => {
   var item = items[id];
@@ -83,6 +89,7 @@ exports.delete = (id, callback) => {
   }
 };
 
+// "Complete deleting a todo"
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
 
 exports.dataDir = path.join(__dirname, 'data');
