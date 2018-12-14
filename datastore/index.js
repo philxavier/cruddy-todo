@@ -2,6 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
+const Promise = require('bluebird');
+
+var readFileAsync = Promise.promisify(fs.readFile);
 
 var items = {};
 
@@ -19,7 +22,7 @@ exports.create = (text, callback) => {
         if (err) {
           throw ('error writing counter');
         } else {
-          callback(null, items);  
+          callback(null, items);
         }
       });
     }
@@ -29,22 +32,39 @@ exports.create = (text, callback) => {
 
 
 exports.readAll = (callback) => {
-  
-  var data = [];
 
+  var data = [];
+  var ids = [];
+  
   fs.readdir(exports.dataDir, (err, files) => {
     if (err) {
       console.log(err);
     } else {
       for (let i = 0; i < files.length; i++) {
-        var id = files[i].split('.')[0];
-        data.push({id: id, text: id});
+        ids.push(files[i].split('.')[0]);
+        var filePath = path.join(exports.dataDir, files[i]);
+        data.push(readFileAsync(filePath));
       }
-      callback(null, data); 
+      Promise.all(data).then(() => {
+        var todos = [];
+        for (var i = 0; i < data.length; i++) {
+          todos.push({id: ids[i], text: data[i]});
+        }
+        callback(null, todos);
+      });
     }
   });
 
 };
+
+//var readFile = Promise.promisify(require("fs").readFile);
+// var files = [];
+// for (var i = 0; i < 100; ++i) {
+//   files.push(fs.writeFileAsync('file-' + i + '.txt', '', 'utf-8'));
+// }
+// Promise.all(files).then(function () {
+//   console.log('all the files were created');
+// });
 
 exports.readOne = (id, callback) => {
   fs.readFile(path.join(exports.dataDir, `${id}.txt`), (err, fileData) => {
@@ -52,7 +72,10 @@ exports.readOne = (id, callback) => {
       console.log(err);
       callback(err, {});
     } else {
-      var todo = {id: id, text: fileData.toString()};
+      var todo = {
+        id: id,
+        text: fileData.toString()
+      };
       callback(null, todo);
     }
   });
@@ -60,19 +83,22 @@ exports.readOne = (id, callback) => {
 };
 
 exports.update = (id, text, callback) => {
-  
+
   if (fs.existsSync(path.join(exports.dataDir, `${id}.txt`))) {
     fs.writeFile(path.join(exports.dataDir, `${id}.txt`), text, (err) => {
       if (err) {
         console.log(err);
         callback(err, {});
       } else {
-        callback(null, {id: id, text: text});  
+        callback(null, {
+          id: id,
+          text: text
+        });
       }
     });
   } else {
     callback('dog', {});
-  }  
+  }
 
 };
 

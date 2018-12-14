@@ -1,9 +1,11 @@
 const expect = require('chai').expect;
 const fs = require('fs');
 const path = require('path');
+const Promise = require('bluebird');
 
 const counter = require('../datastore/counter.js');
 const todos = require('../datastore/index.js');
+
 
 const initializeTestFiles = () => {
   counter.counterFile = path.join(__dirname, './counterTest.txt');
@@ -118,19 +120,29 @@ describe('todos', () => {
     });
 
     // Refactor this test when completing `readAll`
+    var createPromisified = Promise.promisify(todos.create);
+    var readAllPromisified = Promise.promisify(todos.readAll);
+
     it('should return an array with all saved todos', (done) => {
       const todo1text = 'todo 1';
       const todo2text = 'todo 2';
-      const expectedTodoList = [{ id: '00001', text: '00001' }, { id: '00002', text: '00002' }];
-      todos.create(todo1text, (err, todo) => {
-        todos.create(todo2text, (err, todo) => {
-          todos.readAll((err, todoList) => {
-            expect(todoList).to.have.lengthOf(2);
-            expect(todoList).to.deep.include.members(expectedTodoList, 'NOTE: Text field should use the Id initially');
-            done();
+      const expectedTodoList = [{ id: '00001', text: todo1text }, { id: '00002', text: todo2text }];
+      createPromisified(todo1text)
+        .then((todo1) => {
+          createPromisified(todo2text);
+        })
+        .then((todo2) => {
+          readAllPromisified(() => {
           });
+        })
+        .then((todoList) => {
+          expect(todoList).to.have.lengthOf(2);
+          expect(todoList).to.deep.include.members(expectedTodoList);
+          done();
+        })
+        .catch((err) => {
+          done();
         });
-      });
     });
 
   });
